@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model TripRun {
+  id           Int       @id @default(autoincrement())
+  origin       String
+  destination  String
+  distanceMi   Float
+  durationMin  Float
+  mpgUsed      Float
+  fuelPrice    Float
+  tollUsd      Float?
+  co2Kg        Float
+  createdAt    DateTime  @default(now())
+  stops        TripStop[]
+}
+
+model TripStop {
+  id                Int     @id @default(autoincrement())
+  tripRunId         Int
+  name              String
+  lat               Float
+  lon               Float
+  pricePerGal       Float
+  detourMinutes     Float
+  gallonsPurchased  Float
+  tripRun           TripRun @relation(fields: [tripRunId], references: [id])
+}

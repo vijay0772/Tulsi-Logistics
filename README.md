@@ -2,6 +2,17 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Environment variables:
+
+Create a `.env` file with:
+
+```
+DATABASE_URL="file:./dev.db"
+# Optional: enable real APIs instead of demo data
+ORS_API_KEY=your_openrouteservice_api_key
+EIA_API_KEY=your_eia_api_key
+```
+
 First, run the development server:
 
 ```bash
