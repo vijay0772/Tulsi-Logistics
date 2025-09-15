@@ -14,6 +14,15 @@ import { FuelPriceResponse, RouteResponse, TripStopCandidate } from "@/lib/types
 import { toast } from "sonner";
 import fileDownload from "js-file-download";
 
+function Stat({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
+  return (
+    <div className="hidden lg:block bg-background/90 border border-white/10 rounded-xl px-4 py-3 shadow-sm">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="text-xl font-semibold tracking-tight">{value}{suffix}</div>
+    </div>
+  );
+}
+
 function useRoute(origin: string, destination: string) {
   return useQuery<RouteResponse>({
     queryKey: ["route", origin, destination],
@@ -122,7 +131,7 @@ export default function DashboardTabs() {
 
   return (
     <Tabs defaultValue="route" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 bg-background/70 backdrop-blur">
+      <TabsList className="grid w-full grid-cols-4 bg-background/80 backdrop-blur-md rounded-xl shadow-lg max-w-3xl mx-auto">
         <TabsTrigger value="route">Route</TabsTrigger>
         <TabsTrigger value="stops">Fuel Stops</TabsTrigger>
         <TabsTrigger value="costs">Costs</TabsTrigger>
@@ -130,12 +139,12 @@ export default function DashboardTabs() {
       </TabsList>
 
       <TabsContent value="route" className="space-y-4">
-        <Card className="bg-background/70 backdrop-blur">
+        <Card className="bg-background/80 backdrop-blur-md border border-white/10 rounded-2xl">
           <CardHeader>
             <CardTitle>Plan Route</CardTitle>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-5 gap-4">
-            <div className="md:col-span-2 grid gap-3">
+          <CardContent className="grid lg:grid-cols-7 gap-6">
+            <div className="lg:col-span-3 grid gap-4">
               <div>
                 <Label>Origin</Label>
                 <Input value={origin} onChange={e => setOrigin(e.target.value)} placeholder="City, State" />
@@ -144,7 +153,7 @@ export default function DashboardTabs() {
                 <Label>Destination</Label>
                 <Input value={destination} onChange={e => setDestination(e.target.value)} placeholder="City, State" />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <Label>Vehicle MPG</Label>
                   <Input type="number" value={mpg} onChange={e => setMpg(parseFloat(e.target.value))} />
@@ -158,7 +167,7 @@ export default function DashboardTabs() {
                   <Input type="number" value={fuelPct} onChange={e => setFuelPct(parseFloat(e.target.value))} />
                 </div>
               </div>
-              <Button
+              <Button className="w-full"
                 onClick={async () => {
                   try {
                     const r = await refetchRoute();
@@ -175,14 +184,22 @@ export default function DashboardTabs() {
               </Button>
               {routeError && <div className="text-sm text-red-400">Failed to load route. Check API key or inputs.</div>}
               {route && (
-                <div className="text-sm text-muted-foreground space-y-1">
+                <div className="text-sm text-muted-foreground grid grid-cols-2 gap-2 lg:hidden">
                   <div><b>Distance:</b> {route.distanceMi.toLocaleString()} mi</div>
                   <div><b>Duration:</b> {(route.durationMin/60).toFixed(1)} h</div>
                 </div>
               )}
+              {route && (
+                <div className="hidden lg:grid grid-cols-2 xl:grid-cols-4 gap-3">
+                  <Stat label="Distance" value={`${route.distanceMi.toFixed(1)}`} suffix=" mi" />
+                  <Stat label="Duration" value={`${(route.durationMin/60).toFixed(1)}`} suffix=" h" />
+                  <Stat label="Gallons" value={`${(route.distanceMi / mpg).toFixed(1)}`} />
+                  <Stat label="Cost/mi" value={`$${(fuelCost / (route.distanceMi || 1)).toFixed(2)}`} />
+                </div>
+              )}
             </div>
-            <div className="md:col-span-3">
-              <Map polyline={route?.polyline} markers={fuel?.stops?.map(s => ({ lat: s.lat, lon: s.lon, label: s.name }))} height={380} />
+            <div className="lg:col-span-4">
+              <Map polyline={route?.polyline} markers={fuel?.stops?.map(s => ({ lat: s.lat, lon: s.lon, label: s.name }))} height={520} />
               {loadingFuel && <div className="mt-2 text-xs text-white/80">Loading fuel stops…</div>}
             </div>
           </CardContent>
@@ -190,7 +207,7 @@ export default function DashboardTabs() {
       </TabsContent>
 
       <TabsContent value="stops" className="space-y-4">
-        <Card className="bg-background/70 backdrop-blur">
+        <Card className="bg-background/80 backdrop-blur-md border border-white/10 rounded-2xl">
           <CardHeader>
             <CardTitle>Candidate Fuel Stops</CardTitle>
           </CardHeader>
@@ -207,7 +224,7 @@ export default function DashboardTabs() {
                 </TableHeader>
                 <TableBody>
                   {stopsWithSavings.map((s) => (
-                    <TableRow key={s.name} className={s.savings > 0 ? "bg-emerald-500/10" : ""}>
+                    <TableRow key={s.name} className={`${s.savings > 0 ? "bg-emerald-500/10" : ""} hover:bg-white/5 transition-colors`}>
                       <TableCell>{s.name}</TableCell>
                       <TableCell>{s.pricePerGal.toFixed(2)}</TableCell>
                       <TableCell>{s.detourMinutes}</TableCell>
@@ -222,7 +239,7 @@ export default function DashboardTabs() {
       </TabsContent>
 
       <TabsContent value="costs" className="space-y-4">
-        <Card className="bg-background/70 backdrop-blur">
+        <Card className="bg-background/80 backdrop-blur-md border border-white/10 rounded-2xl">
           <CardHeader>
             <CardTitle>Trip Costs</CardTitle>
           </CardHeader>
@@ -270,7 +287,7 @@ export default function DashboardTabs() {
       </TabsContent>
 
       <TabsContent value="co2" className="space-y-4">
-        <Card className="bg-background/70 backdrop-blur">
+        <Card className="bg-background/80 backdrop-blur-md border border-white/10 rounded-2xl">
           <CardHeader>
             <CardTitle>CO₂ / ESG</CardTitle>
           </CardHeader>

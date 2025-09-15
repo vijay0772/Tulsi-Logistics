@@ -10,9 +10,10 @@ type MapProps = {
   polyline?: LatLng[];
   markers?: { lat: number; lon: number; label?: string }[];
   height?: number;
+  showEndpoints?: boolean;
 };
 
-export function Map({ polyline = [], markers = [], height = 360 }: MapProps) {
+export function Map({ polyline = [], markers = [], height = 360, showEndpoints = true }: MapProps) {
   const center = polyline.length > 0 ? [polyline[0].lat, polyline[0].lon] : [39.5, -98.35];
 
   // Configure default marker icons to avoid 404s
@@ -38,6 +39,19 @@ export function Map({ polyline = [], markers = [], height = 360 }: MapProps) {
     return null;
   }
 
+  const originIcon = L.divIcon({
+    className: "",
+    html: `<div style="transform: translate(-12px, -22px); display: grid; place-items: center; width: 26px; height: 26px; background: #10b981; color: white; border-radius: 9999px; box-shadow: 0 2px 6px rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.7); font-size: 14px;">⚑</div>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 26],
+  });
+  const destIcon = L.divIcon({
+    className: "",
+    html: `<div style="transform: translate(-12px, -22px); display: grid; place-items: center; width: 26px; height: 26px; background: #ef4444; color: white; border-radius: 9999px; box-shadow: 0 2px 6px rgba(0,0,0,.35); border: 2px solid rgba(255,255,255,.7); font-size: 14px;">⚑</div>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 26],
+  });
+
   return (
     <div className="w-full rounded-xl overflow-hidden shadow-xl ring-1 ring-white/10" style={{ height }}>
       <MapContainer center={center as unknown as [number, number]} zoom={5} style={{ height: "100%", width: "100%" }} scrollWheelZoom>
@@ -48,6 +62,16 @@ export function Map({ polyline = [], markers = [], height = 360 }: MapProps) {
         <FitOnChange />
         {polyline.length > 1 && (
           <Polyline positions={polyline.map(p => [p.lat, p.lon]) as [number, number][]} color="#22d3ee" weight={6} opacity={0.8} />
+        )}
+        {showEndpoints && polyline.length > 0 && (
+          <>
+            <Marker position={[polyline[0].lat, polyline[0].lon] as [number, number]} icon={originIcon}>
+              <Tooltip>Origin</Tooltip>
+            </Marker>
+            <Marker position={[polyline[polyline.length - 1].lat, polyline[polyline.length - 1].lon] as [number, number]} icon={destIcon}>
+              <Tooltip>Destination</Tooltip>
+            </Marker>
+          </>
         )}
         {markers.map((m, idx) => (
           <Marker key={idx} position={[m.lat, m.lon] as [number, number]}>
