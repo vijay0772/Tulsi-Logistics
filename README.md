@@ -1,47 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tulsi Logistics — Fuel & Cost Optimization Platform
 
-## Getting Started
+A modern trucking ops dashboard that optimizes routes, fuel stops, costs, and CO₂ — built with Next.js (App Router), TypeScript, Tailwind v4, shadcn/ui, React Query, Prisma, and Leaflet.
 
-Environment variables:
+## ✨ Highlights
+- Fullscreen looping truck video with dark overlay for an immersive UI
+- Tabs: Route • Fuel Stops • Costs • CO₂/ESG
+- Live routing via OpenRouteService (fallback to OSRM) and live diesel price via EIA
+- Dynamic candidate fuel stops placed along the corridor (OSM Overpass names)
+- KPIs: distance, duration, gallons, fuel cost, cost/mi, CO₂
+- Editable diesel price and sensitivity sliders
+- Interactive map with polyline and stop pins (custom truck icon)
+- CSV ESG report export
+- SQLite via Prisma (drop-in Postgres ready)
 
-Create a `.env` file with:
+## 🧱 Tech Stack
+- Next.js 15 (App Router), TypeScript
+- Tailwind CSS v4 + shadcn/ui components
+- React Query (TanStack)
+- Prisma ORM + SQLite (dev) — ready for Postgres in prod
+- React Leaflet + OpenStreetMap tiles
 
+## 🚀 Quick Start
+```bash
+cd web
+npm install
+# create .env as below, then
+npm run dev
 ```
+Open `http://localhost:3000`.
+
+## 🔑 Environment Variables (.env)
+```env
 DATABASE_URL="file:./dev.db"
-# Optional: enable real APIs instead of demo data
+# Optional: enable live routing and fuel price
 ORS_API_KEY=your_openrouteservice_api_key
 EIA_API_KEY=your_eia_api_key
 ```
+- Routing: Uses ORS geocoding + directions. If missing/unavailable, falls back to OSRM public router.
+- Fuel price: Uses EIA weekly U.S. diesel price (cached ~1h). If missing/unavailable, falls back to demo.
 
-First, run the development server:
+## 🧭 Features Walkthrough
+- Route: Enter origin/destination, MPG, tank size, current fuel%. Click Update to fetch live route and re-fit the map.
+- Fuel Stops: Shows corridor candidates with OSM names, detour penalty heuristic, and net savings ordering.
+- Costs: Editable diesel price, KPIs, and MPG/price sensitivity.
+- CO₂ / ESG: Calculates using 10.21 kg CO₂/gal. Export a clean CSV.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🗺️ Data Sources
+- Routing: OpenRouteService (primary) → OSRM (fallback)
+- Fuel price: U.S. EIA Open Data
+- Stop names: OpenStreetMap Overpass API near sampled corridor points
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Development
+- Prisma/SQLite is pre-initialized. Schema at `prisma/schema.prisma`.
+- API routes live in `src/app/api/*`.
+- Dashboard UI in `src/components/dashboard/Tabs.tsx`.
+- Map in `src/components/map/Map.tsx`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ☁️ Deploy to Vercel
+1) Push the `web` folder to GitHub.
+2) On Vercel, import the repo and set the project root to `web`.
+3) Add env vars (`DATABASE_URL`, optional `ORS_API_KEY`, `EIA_API_KEY`).
+4) Build Command: `npm run build` • Output: `.next`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+SQLite is fine for demos. For production:
+- Switch `DATABASE_URL` to Postgres (Vercel Postgres or your provider)
+- Run `npx prisma migrate deploy` on your deployment pipeline
 
-## Learn More
+## 🔮 Roadmap
+- TollGuru integration for toll estimates
+- Real truck-stop fuel prices (Love’s / Pilot / TA) if APIs are available
+- PDF ESG report and richer sensitivity/tornado visuals
+- Persistent trip history and sharing
 
-To learn more about Next.js, take a look at the following resources:
+## 🧩 Screens
+- Fullscreen video background
+- Tabs for Route / Stops / Costs / CO₂
+- Interactive map with truck markers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with ❤️ for operators who care about margins and emissions.
