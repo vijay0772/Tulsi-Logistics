@@ -124,3 +124,13 @@
     @apply px-3 sm:px-4 md:px-6 lg:px-8;
   }
 }
+
+@keyframes loading-fill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+@keyframes truck-move {
+  0% { left: 0; }
+  100% { left: calc(100% - 2.5rem); }
+}

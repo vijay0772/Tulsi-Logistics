@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/providers";
+import SplashLoader from "@/components/SplashLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased` }>
+        <SplashLoader />
         <div className="fixed inset-0 -z-10 overflow-hidden">
           <video
             className="h-full w-full object-cover"
